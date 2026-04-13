@@ -8,7 +8,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.JoinTable;
-
 import jakarta.persistence.JoinColumn;
 import java.util.List;
 
@@ -16,20 +15,20 @@ import java.util.List;
 @Table(name = "roles")
 public class Role {
     public Role() {
-    // Default constructor
+        // Default constructor
     }
+
     public Role(String name, String description) {
         this.name = name;
         this.description = description;
     }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-
     @Column(name = "name", nullable = false, unique = true, length = 40)
     private String name;
-
-    @Column(name = "description",nullable = false, length = 150)
+    @Column(name = "description", nullable = false, length = 150)
     private String description;
 
     // Getters

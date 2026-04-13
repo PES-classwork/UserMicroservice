@@ -14,11 +14,11 @@ public class RoleServiceImpl implements RoleService {
     public RoleServiceImpl(RoleDAO roleDAO) {
         this.roleDAO = roleDAO;
     }
-    
+
     @Transactional
     @Override
     public void addRole(Role role) {
         // TODO Auto-generated method stub
         roleDAO.addRole(role);
     }
-} 
+}
