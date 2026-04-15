@@ -4,11 +4,13 @@ import bt.edu.gcit.usermicroservice.entity.Customer;
 import bt.edu.gcit.usermicroservice.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import bt.edu.gcit.usermicroservice.entity.AuthenticationType;
 import org.springframework.http.HttpStatus;
 
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
 @RequestMapping("/api/customer")

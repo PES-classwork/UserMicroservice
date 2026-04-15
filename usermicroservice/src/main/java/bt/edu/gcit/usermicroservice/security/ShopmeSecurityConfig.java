@@ -2,9 +2,7 @@ package bt.edu.gcit.usermicroservice.security;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.http.HttpMethod;
@@ -16,8 +14,12 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetailsService;
+
 import java.util.Arrays;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import bt.edu.gcit.usermicroservice.security.JwtRequestFilter;
+import bt.edu.gcit.usermicroservice.security.oauth.CustomerOAuth2UserService;
+import bt.edu.gcit.usermicroservice.security.oauth.OAuth2LoginSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -32,11 +34,16 @@ public class ShopmeSecurityConfig {
     @Autowired
     private UserDetailsService userDetailsService;
 
+    @Autowired
+    private CustomerOAuth2UserService oAuth2UserService;
+
+    @Autowired
+    private OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+
     @Bean
-    public AuthenticationManager authenticationManager() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return new ProviderManager(authProvider);
+    public AuthenticationManager customAuthenticationManager() throws Exception {
+        System.out.println("H2i ");
+        return new ProviderManager(Arrays.asList(authProvider()));
     }
 
     @Bean
@@ -46,49 +53,57 @@ public class ShopmeSecurityConfig {
 
     @Bean
     public AuthenticationProvider authProvider() {
-    System.out.println("Initializing AuthenticationProvider...");
-
-    // Pass the userDetailsService directly into the constructor
-    DaoAuthenticationProvider authProvider = new
-    DaoAuthenticationProvider(userDetailsService);
-
-    // Set the password encoder using the setter
-    authProvider.setPasswordEncoder(passwordEncoder());
-
-    System.out.println("UserDetailsService assigned: " +
-    userDetailsService.getClass().getName());
-    return authProvider;
+        System.out.println("Hi ");
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        System.out.println("UserDetailsService: " +
+                userDetailsService.getClass().getName());
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
+        System.out.println("AuthProvider: " + authProvider.getClass().getName());
+        return authProvider;
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http
-    .csrf(csrf -> csrf.disable())
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(configurer -> configurer
+                        .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/logout").permitAll()
 
-    .sessionManagement(session ->
-    session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        .requestMatchers(HttpMethod.POST, "/api/users").hasAuthority("Admin")
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/users/checkDuplicateEmail")
+                        .hasAuthority("Admin")
+                        .requestMatchers(HttpMethod.PUT, "/api/users/{id}").hasAuthority("Admin")
+                        .requestMatchers(HttpMethod.DELETE,
+                                "/api/users/{id}")
+                        .hasAuthority("Admin")
+                        .requestMatchers(HttpMethod.PUT, "/api/users/{id}/enabled").permitAll()
 
-    .authorizeHttpRequests(auth -> auth
-    .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-    .requestMatchers(HttpMethod.POST, "/api/users").hasAuthority("Admin")
-    .requestMatchers(HttpMethod.GET,
-    "/api/users/checkDuplicateEmail").hasAuthority("Admin")
-    .requestMatchers(HttpMethod.PUT, "/api/users/{id}").hasAuthority("Admin")
-    .requestMatchers(HttpMethod.DELETE,"/api/users/{id}").hasAuthority("Admin")
-    .requestMatchers(HttpMethod.PUT, "/api/users/{id}/enabled").permitAll()
-    .requestMatchers(HttpMethod.GET, "/api/countries/**").permitAll()
-    .requestMatchers(HttpMethod.POST, "/api/countries").permitAll()
-    .requestMatchers(HttpMethod.PUT, "/api/countries").permitAll()
-    .requestMatchers(HttpMethod.DELETE, "/api/countries").permitAll()
-    .requestMatchers(HttpMethod.GET, "/api/states/**").permitAll()
-    .requestMatchers(HttpMethod.POST, "/api/states/{country_id}").permitAll()
-    .requestMatchers(HttpMethod.PUT, "/api/states").permitAll()
-    .requestMatchers(HttpMethod.DELETE, "/api/states").permitAll()
-    .requestMatchers(HttpMethod.POST, "/api/customer/*").permitAll())
+                        .requestMatchers(HttpMethod.PUT, "/api/users/{id}/enabled").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/countries/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/countries").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/countries").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/countries").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/states/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/states/{country_id}")
+                        .permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/states").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/states").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/customer/*").permitAll()
 
-    .addFilterBefore(jwtRequestFilter,
-    UsernamePasswordAuthenticationFilter.class);
-
-    return http.build();
+                        .anyRequest().authenticated()
+                    )
+        .addFilterBefore(jwtRequestFilter,
+                        UsernamePasswordAuthenticationFilter.class);
+                        
+        http.oauth2Login()
+                .userInfoEndpoint()
+                .userService(oAuth2UserService)
+                .and()
+                .successHandler(oAuth2LoginSuccessHandler);
+        return http.build();
     }
 }

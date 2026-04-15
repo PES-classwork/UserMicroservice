@@ -3,8 +3,7 @@ package bt.edu.gcit.usermicroservice.entity;
 import jakarta.persistence.*;
 import java.util.Date;
 import java.util.List;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.JoinColumn;
+
 import bt.edu.gcit.usermicroservice.entity.AuthenticationType;
 import bt.edu.gcit.usermicroservice.entity.Country;
 

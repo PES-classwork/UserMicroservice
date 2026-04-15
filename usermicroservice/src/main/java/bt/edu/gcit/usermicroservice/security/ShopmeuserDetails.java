@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 public class ShopmeuserDetails implements UserDetails {
+
     private User user;
     // private String email;
     // private String password;

@@ -4,6 +4,7 @@ import bt.edu.gcit.usermicroservice.entity.Country;
 import bt.edu.gcit.usermicroservice.entity.State;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
@@ -19,16 +20,16 @@ public class StateDAOImpl implements StateDAO {
         this.entityManager = entityManager;
     }
 
-    @Override
-    public List<State> findByCountryOrderByNameAsc(Country country) {
-        return entityManager
-                .createQuery("select s from State s where s.country = :country order by s.name asc", State.class)
-                .setParameter("country", country).getResultList();
-    }
+ @Override
+ public List<State> findByCountryOrderByNameAsc(Country country) {
+ return entityManager.createQuery("select s from State s where s.country = :country order by s.name asc", State.class)
+ .setParameter("country", country).getResultList();
+ }
 
     @Override
     public List<State> findAll() {
-        return entityManager.createQuery("select s from State s", State.class).getResultList();
+        return entityManager.createQuery("select s from State s",
+                State.class).getResultList();
     }
 
     @Override

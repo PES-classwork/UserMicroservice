@@ -6,6 +6,7 @@ import jakarta.persistence.TypedQuery;
 import bt.edu.gcit.usermicroservice.entity.Customer;
 import org.springframework.stereotype.Repository;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.List;
 import bt.edu.gcit.usermicroservice.entity.Country;
 import bt.edu.gcit.usermicroservice.entity.AuthenticationType;

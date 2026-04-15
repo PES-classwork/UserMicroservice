@@ -1,4 +1,3 @@
-// AuthServiceImpl.java
 package bt.edu.gcit.usermicroservice.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserDetailsService userDetailsService;
 
     @Autowired
-    public AuthServiceImpl(AuthenticationManager authenticationManager,
+    public AuthServiceImpl(@Lazy AuthenticationManager authenticationManager,
             @Lazy UserDetailsService userDetailsService) {
         this.authenticationManager = authenticationManager;
 
@@ -33,7 +32,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public UserDetails login(String email, String password) {
         // System.out.println("show: " + authenticationManager.authenticate(new
-        // UsernamePasswordAuthenticationToken(email, password)));
+        // UsernamePasswordAuthenticationToken(email, password));
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
         return userDetailsService.loadUserByUsername(email);
     }

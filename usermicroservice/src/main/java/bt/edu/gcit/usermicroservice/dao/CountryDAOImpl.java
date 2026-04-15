@@ -34,11 +34,11 @@ public class CountryDAOImpl implements CountryDAO {
                 .getResultList();
     }
 
- @Override
- public List<Country> findAllByOrderByNameAsc() {
- return entityManager.createQuery("SELECT c FROM Country c ORDER BY c.nameASC", Country.class)
- .getResultList();
- }
+    @Override
+    public List<Country> findAllByOrderByNameAsc() {
+        return entityManager.createQuery("SELECT c FROM Country c ORDER BY c.name ASC", Country.class)
+                .getResultList();
+    }
 
     @Override
     public void update(Country country) {

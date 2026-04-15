@@ -19,20 +19,29 @@ import java.nio.file.Paths;
 @Service
 public class UserServiceImpl implements UserService {
     private UserDAO userDAO;
-    private final PasswordEncoder passwordEncoder;
+    private final BCryptPasswordEncoder passwordEncoder;
     private final String uploadDir = "src/main/resources/static/images";
 
     @Autowired
     @Lazy
-    public UserServiceImpl(UserDAO userDAO, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserDAO userDAO, BCryptPasswordEncoder passwordEncoder) {
         this.userDAO = userDAO;
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Transactional
+    // @Override
+    // @Transactional
+    // public User save(User user) {
+    // user.setPassword(passwordEncoder.encode(user.getPassword()));
+    // return userDAO.save(user);
+    // }
     @Override
+    @Transactional
     public User save(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        // Only encode if password is not already BCrypt encoded
+        if (!user.getPassword().startsWith("$2a$")) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
         return userDAO.save(user);
     }
 
@@ -63,8 +72,8 @@ public class UserServiceImpl implements UserService {
         existingUser.setLastName(updatedUser.getLastName());
         existingUser.setEmail(updatedUser.getEmail());
 
-        // Check if the password has changed. If it has, encode the new password
-        // beforesaving.
+        // Check if the password has changed. If it has, encode the new password before
+        // saving.
         if (!existingUser.getPassword().equals(updatedUser.getPassword())) {
 
             existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
@@ -118,5 +127,4 @@ public class UserServiceImpl implements UserService {
         user.setPhoto(filename);
         save(user);
     }
-
 }

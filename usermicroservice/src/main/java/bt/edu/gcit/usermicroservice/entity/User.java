@@ -12,35 +12,45 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.JoinTable;
 import java.util.HashSet;
 import java.util.Set;
-
 import bt.edu.gcit.usermicroservice.entity.Role;
 import jakarta.persistence.FetchType;
 
 @Entity
 @Table(name = "user")
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(length = 128, nullable = false, unique = true)
     private String email;
+
     @Column(nullable = false)
     private boolean enabled;
-    @Column(name = "first_name", length = 45, nullable = false)
+
+    @Column(name = "first_name", length = 45 ,nullable = false)
     private String firstName;
-    @Column(name = "last_name", length = 45, nullable = false)
+
+    @Column(name = "last_name", length = 45 ,nullable = false)
     private String lastName;
-    @Column(length = 64, nullable = false)
+
+    @Column(length = 64 ,nullable = false)
     private String password;
+
     @Column(length = 64)
     private String photo;
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles = new HashSet<>();
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "users_roles",
+    joinColumns = @JoinColumn(name = "user_id"),
+    inverseJoinColumns = @JoinColumn(name ="role_id")
+    )
+
+    private Set<Role> roles = new HashSet<>();
     // Constructors
     public User() {
-        // Empty constructor
+    // Empty constructor
     }
 
     public User(String email, String password, String firstName, String lastName) {
@@ -118,5 +128,7 @@ public class User {
     public void setPhoto(String photo) {
         this.photo = photo;
     }
-
 }
+
+
+
