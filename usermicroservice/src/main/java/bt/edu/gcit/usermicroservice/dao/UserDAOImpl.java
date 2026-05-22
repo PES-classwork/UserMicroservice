@@ -19,6 +19,15 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
+    public List<User> getAllUsers() {
+        // Implement the logic to retrieve all users from the database
+        // and return them as a list
+        TypedQuery<User> query = entityManager.createQuery("from User", User.class);
+        List<User> users = query.getResultList();
+        return users;
+    }
+
+    @Override
     public User save(User user) {
         return entityManager.merge(user);
     }

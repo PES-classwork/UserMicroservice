@@ -23,16 +23,21 @@ import java.io.IOException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import bt.edu.gcit.usermicroservice.entity.Role;
+import bt.edu.gcit.usermicroservice.service.ImageUploadService;
+
 import java.util.Set;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
 public class UserRestController {
     private UserService userService;
+    private ImageUploadService imageUploadService;
 
     @Autowired
-    public UserRestController(UserService userService) {
+    public UserRestController(UserService userService, ImageUploadService imageUploadService) {
         this.userService = userService;
+        this.imageUploadService = imageUploadService;
     }
 
     @PostMapping("/users")
@@ -64,6 +69,18 @@ public class UserRestController {
 
             // Save the user and get the ID
             User savedUser = userService.save(user);
+
+            // Upload the user photo
+            // System.out.println("Uploadingphoto"+savedUser.getId().intValue());
+            // userService.uploadUserPhoto(savedUser.getId().intValue(), photo);
+
+            // Upload the user photo to Cloudinary
+            String imageUrl = imageUploadService.uploadImage(photo);
+            savedUser.setPhoto(imageUrl);
+            
+            // Update the user with the photo URL
+            userService.updateUser(savedUser.getId().intValue(),
+                    savedUser);
 
             // Upload the user photo
             System.out.println("Uploading photo" + savedUser.getId().intValue());
@@ -123,5 +140,10 @@ public class UserRestController {
         userService.updateUserEnabledStatus(id, enabled);
         System.out.println("User enabled status updated successfully");
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/users")
+    public List<User> getAllUsers() {
+        return userService.getAllUsers();
     }
 }

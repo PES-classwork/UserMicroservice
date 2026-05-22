@@ -15,7 +15,7 @@ import org.springframework.util.StringUtils;
 import java.nio.file.Path;
 import bt.edu.gcit.usermicroservice.exception.FileSizeException;
 import java.nio.file.Paths;
-
+import java.util.List;
 @Service
 public class UserServiceImpl implements UserService {
     private UserDAO userDAO;
@@ -27,6 +27,11 @@ public class UserServiceImpl implements UserService {
     public UserServiceImpl(UserDAO userDAO, BCryptPasswordEncoder passwordEncoder) {
         this.userDAO = userDAO;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        return userDAO.getAllUsers();
     }
 
     // @Override

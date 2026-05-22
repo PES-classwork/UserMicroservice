@@ -27,23 +27,44 @@ public class AuthController {
     @Autowired
     private JWTUtil jwtUtil;
 
+    // @PostMapping("/login")
+    // public ResponseEntity<Map<String, Object>> login(@RequestBody User user,
+    // HttpServletResponse response) {
+    // UserDetails userDetails = authService.login(user.getEmail(),
+    // user.getPassword());
+    // String jwt = jwtUtil.generateToken(userDetails);
+    // // Set JWT as a cookie
+    // Cookie jwtCookie = new Cookie("JWT-TOKEN", jwt);
+    // jwtCookie.setHttpOnly(true);
+    // response.addCookie(jwtCookie);
+    // Map<String, Object> responseBody = new HashMap<>();
+    // responseBody.put("user", userDetails);
+    // return ResponseEntity.ok(responseBody);
+    // // Map<String, Object> response = new HashMap<>();
+    // // response.put("jwt", jwt);
+    // // response.put("user", userDetails);
+    // // return ResponseEntity.ok(response);
+    // }
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody User user,
             HttpServletResponse response) {
         UserDetails userDetails = authService.login(user.getEmail(),
                 user.getPassword());
         String jwt = jwtUtil.generateToken(userDetails);
-        // Set JWT as a cookie
+
+        // Keep your cookie mechanism active if needed
         Cookie jwtCookie = new Cookie("JWT-TOKEN", jwt);
         jwtCookie.setHttpOnly(true);
+        // If working across ports, you might need path configuration:
+        jwtCookie.setPath("/");
         response.addCookie(jwtCookie);
+
+        // CRITICAL FIX: Send the token explicitly in the JSON response object body
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("user", userDetails);
+        responseBody.put("token", jwt); // <--- ADD THIS LINE HERE
+
         return ResponseEntity.ok(responseBody);
-        // Map<String, Object> response = new HashMap<>();
-        // response.put("jwt", jwt);
-        // response.put("user", userDetails);
-        // return ResponseEntity.ok(response);
     }
 
     @PostMapping("/logout")

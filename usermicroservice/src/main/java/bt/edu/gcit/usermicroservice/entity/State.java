@@ -1,6 +1,7 @@
 package bt.edu.gcit.usermicroservice.entity;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "states")
@@ -8,9 +9,12 @@ public class State {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
     @Column(name = "name")
     private String name;
+    
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "country_id", nullable = false)
     private Country country;
 
